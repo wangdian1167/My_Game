@@ -23,7 +23,7 @@ from matplotlib import pyplot as plt
 
 # 基本参数
 D_players = {} # 玩家字典
-N_players = 100 # 玩家数量
+N_players = 50 # 玩家数量
 Rank_max = 200 # 最高段位
 
 # =============================================================================
@@ -88,7 +88,7 @@ def fight(p1, p2):
         
         # 段位
         if D_players[p_win]['winning_streak'] >= 3: #第三连胜开始有连胜奖励
-            D_players[p_win]['Rank'] += 2 # 段位增加 连胜奖励
+            D_players[p_win]['Rank'] += 1 # 段位增加 连胜奖励
         else:
             D_players[p_win]['Rank'] += 1 # 段位增加
         if D_players[p_win]['Rank'] > Rank_max: # 不能超过最高段位
