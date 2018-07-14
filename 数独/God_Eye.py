@@ -3,12 +3,14 @@
 Created on Fri Jul 13 08:44:25 2018
 
 解数独
+行列均从 0-8
+宫从左至右然后从上至下为 1-9
 
 @author: Administrator
 """
 
 import numpy as np
-
+import time
 # 判断行列在第几宫
 def get_G(i, j):
     m = i//3 + 1
@@ -16,7 +18,7 @@ def get_G(i, j):
     N_G = (m-1)*3+n
     return N_G
 
-# 获得宫的相应行列数 (0起）
+# 获得宫的相应行列数
 def G_rc(N_G):
     m = (N_G-1)//3 +1
     n = N_G - (m-1)*3
@@ -253,50 +255,10 @@ def complete_check(sm):
         if 0 not in sm:
             complete = True
     return complete
-                        
-# 随机填充数字后再填
-def sol_random(sm):
-    complete = False
-    out_time = []
-    L_prob= prob_num_all(sm) #分析可能性
-    r_L = [1,3,5,7,9]
-    sm_p = sm.copy()
-    for r1 in L_prob[r_L[0]][2]:
-        for r2 in L_prob[r_L[1]][2]:
-            for r3 in L_prob[r_L[2]][2]:
-                for r4 in L_prob[r_L[3]][2]:
-                    sm_p[L_prob[r_L[0]][0], L_prob[r_L[0]][1]] = r1
-                    sm_p[L_prob[r_L[1]][0], L_prob[r_L[1]][1]] = r2
-                    sm_p[L_prob[r_L[2]][0], L_prob[r_L[2]][1]] = r3
-                    sm_p[L_prob[r_L[3]][0], L_prob[r_L[3]][1]] = r4
-                    r_combine = [r1, r2, r3, r4]
-                    if rule_check(sm_p):
-                        print(r_combine)
-                        k = 0
-                        while(1):
-                            k += 1
-                            sm_p, err = sol_origin(sm_p, prt=1) # 常规解法
-                            if err:
-                                break
-                            if complete_check(sm):
-                                complete = True
-                                sm_complete = sm_p.copy()
-                                break
-                            if k > 70:
-                                out_time.append(sm_p.copy())
-                                print('超时')
-                                break
-                    else:
-                        break
-                    if err:
-                        print('不通过！')
-                        break
-    if complete:
-        return sm_complete
-    else:
-        return out_time
-    
-# 简单级 常规解法即可
+
+
+
+# 简单  常规解法即可
 #sl_0 = [[6,4,0,  0,3,0,  0,0,7],
 #        [5,0,1,  0,7,0,  9,0,0],
 #        [0,0,0,  0,0,0,  0,1,0],
@@ -309,7 +271,7 @@ def sol_random(sm):
 #        [2,0,8,  3,0,0,  0,4,0],
 #        [7,5,0,  0,0,0,  0,9,6]]
 
-# 困难 需要预测
+# 困难  需要预测
 #sl_0 = [[0,0,0,  0,0,6,  0,0,8],
 #        [0,6,0,  0,5,0,  0,2,0],
 #        [0,2,0,  0,0,7,  0,6,0],
@@ -322,7 +284,7 @@ def sol_random(sm):
 #        [0,0,0,  5,0,3,  9,8,0],
 #        [9,0,5,  8,0,0,  0,0,0]]
 
-# 专家 
+# 专家  BOSS级别
 sl_0 = [[0,0,0,  0,0,0,  0,0,0],
         [0,3,0,  0,0,9,  0,5,0],
         [0,0,9,  8,2,0,  0,1,3],
@@ -339,6 +301,7 @@ sl_1 = sl_0.copy()
 
 sm = np.array(sl_0)
 
+time_1 = time.time() #开始计时
 # 初步填充数字
 for N in range(0, 5):
     print(N)
@@ -348,9 +311,9 @@ for N in range(0, 5):
         break
 
 complete = False
-out_time = []
+out_time = []  # 用于存储填充后未能解出结果的数独，且该数独当前没有违反规则
 L_prob= prob_num_all(sm) #分析可能性
-r_L = [1,3,5,7,9]
+r_L = [1,3,5,7]  # 随机指定四个空值用于填充
 for r1 in L_prob[r_L[0]][2]:
     for r2 in L_prob[r_L[1]][2]:
         for r3 in L_prob[r_L[2]][2]:
@@ -375,56 +338,102 @@ for r1 in L_prob[r_L[0]][2]:
                             complete = True
                             sm_complete = sm_p.copy()
                             break
-                        if k > 50:
+                        if k > 30:
                             if rule_check(sm_p, prt=1):
                                 out_time.append(sm_p.copy())
                                 print('备选方案已添加')
-                            print('超时')
-                            break
-
-print('第一次预测结束，开始对多项情况继续求解')
-complete = False
-out_time2 = []
-for sm in out_time:
-    L_prob= prob_num_all(sm) #分析可能性
-    r_L = [1,3,5,7,9]
-    for r1 in L_prob[r_L[0]][2]:
-        for r2 in L_prob[r_L[1]][2]:
-            for r3 in L_prob[r_L[2]][2]:
-                for r4 in L_prob[r_L[3]][2]:
-                    sm_p = sm.copy()
-                    sm_p[L_prob[r_L[0]][0], L_prob[r_L[0]][1]] = r1
-                    sm_p[L_prob[r_L[1]][0], L_prob[r_L[1]][1]] = r2
-                    sm_p[L_prob[r_L[2]][0], L_prob[r_L[2]][1]] = r3
-                    sm_p[L_prob[r_L[3]][0], L_prob[r_L[3]][1]] = r4
-                    r_combine = [r1, r2, r3, r4]
-                    if rule_check(sm_p):
-                        print('预测数为:', r_combine)
-                        k = 0
-                        while(1):
-                            k += 1
-                            if k%10 == 0:
-                                print('k:', k)
-                            sm_p, err = sol_origin(sm_p, prt=1) # 常规解法
-                            if err:
-                                break
-                            if complete_check(sm_p):
-                                complete = True
-                                sm_complete = sm_p.copy()
-                                print('-----------------------解出答案-------------------------')
-                                break
-                            if k > 71:
-                                if rule_check(sm_p, prt=1):
-                                    out_time2.append(sm_p.copy())
-                                    print('备选方案已添加')
+                            else:
                                 print('超时')
+                            break
+                if complete:
+                    break
+            if complete:
+                break
+        if complete:
+            break
+    if complete:
+        break
+
+# 第一次预测填充四个值后，并不能用常规方法完整解出答案，此时需要再预测四个值（在上一次out_time中）
+print('第一次预测结束，开始对多项情况继续求解')
+if complete == False:
+    out_time2 = []
+    for sm in out_time:
+        L_prob= prob_num_all(sm) #分析可能性
+        r_L = [1,3,5,7,9] # 随机指定四个空值用于填充
+        for r1 in L_prob[r_L[0]][2]:
+            for r2 in L_prob[r_L[1]][2]:
+                for r3 in L_prob[r_L[2]][2]:
+                    for r4 in L_prob[r_L[3]][2]:
+                        for r5 in L_prob[r_L[4]][2]:
+                            sm_p = sm.copy()
+                            sm_p[L_prob[r_L[0]][0], L_prob[r_L[0]][1]] = r1
+                            sm_p[L_prob[r_L[1]][0], L_prob[r_L[1]][1]] = r2
+                            sm_p[L_prob[r_L[2]][0], L_prob[r_L[2]][1]] = r3
+                            sm_p[L_prob[r_L[3]][0], L_prob[r_L[3]][1]] = r4
+                            sm_p[L_prob[r_L[4]][0], L_prob[r_L[4]][1]] = r5
+                            r_combine = [r1, r2, r3, r4, r5]
+                            if rule_check(sm_p):
+                                print('预测数为:', r_combine)
+                                k = 0
+                                while(1):
+                                    k += 1
+                                    if k%10 == 0:
+                                        print('k:', k)
+                                    sm_p, err = sol_origin(sm_p, prt=0) # 常规解法
+                                    if err:
+                                        break
+                                    if complete_check(sm_p):
+                                        complete = True
+                                        sm_complete = sm_p.copy()
+                                        print('-----------------------解出答案-------------------------')
+                                        break
+                                    if k > 30:
+                                        if rule_check(sm_p, prt=0):
+                                            out_time2.append(sm_p.copy())
+                                            print('备选方案已添加')
+                                        else:
+                                            print('超时')
+                                        break
+                            if complete:
                                 break
+                        if complete:
+                            break
+                    if complete:
+                        break
+                if complete:
+                    break
+            if complete:
+                break
+        if complete:
+            break
 
 if complete:
     print('最终结果为：')
     print(sm_complete)
 else:
     print('还没结束！！！')
+
+time_2 = time.time() #结束计时
+time_use = (time_2 - time_1)/60
+print('最终用时为%3.2f分'%time_use)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
