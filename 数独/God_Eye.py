@@ -297,18 +297,31 @@ def complete_check(sm):
 #        [0,0,0,  9,0,0,  0,0,0],
 #        [0,6,0,  1,0,5,  4,0,0]]
 
-# 地狱  号称最难数独
-sl_0 = [[0,0,5,  3,0,0,  0,0,0],
-        [8,0,0,  0,0,0,  0,2,0],
-        [0,7,0,  0,1,0,  5,0,0],
+# 地狱1  号称最难数独 （21提示）
+sl_0 = [[8,0,0,  0,0,0,  0,0,0],
+        [0,0,3,  6,0,0,  0,0,0],
+        [0,7,0,  0,9,0,  2,0,0],
        
-        [4,0,0,  0,0,5,  3,0,0],
-        [0,1,0,  0,7,0,  0,0,6],
-        [0,0,3,  2,0,0,  0,8,0],
+        [0,5,0,  0,0,7,  0,0,0],
+        [0,0,0,  0,4,5,  7,0,0],
+        [0,0,0,  1,0,0,  0,3,0],
        
-        [0,6,0,  5,0,0,  0,0,9],
-        [0,0,4,  0,0,0,  0,3,0],
-        [0,0,0,  0,0,9,  7,0,0]]
+        [0,0,1,  0,0,0,  0,6,8],
+        [0,0,8,  5,0,0,  0,1,0],
+        [0,9,0,  0,0,0,  4,0,0]]
+
+# 地狱2  仅17提示
+sl_0 = [[0,5,0,  6,0,0,  0,0,0],
+        [0,0,0,  0,0,0,  7,3,0],
+        [0,0,0,  1,0,0,  0,0,0],
+       
+        [0,0,0,  0,7,0,  8,0,0],
+        [0,6,0,  0,0,0,  0,5,0],
+        [1,0,0,  0,0,0,  0,0,0],
+       
+        [7,0,0,  0,4,0,  2,0,0],
+        [0,0,4,  0,3,0,  0,0,0],
+        [0,0,0,  5,0,0,  0,6,0]]
 
 
 sl_1 = sl_0.copy()
@@ -459,6 +472,60 @@ if complete == False:
                                     else:
                                         print('超时')
                                     break
+                        if complete:
+                            break
+                    if complete:
+                        break
+                if complete:
+                    break
+            if complete:
+                break
+        if complete:
+            break
+
+# 第四次添加预测值（仅限地狱难度）
+if complete == False:
+    print('第三次预测开始')
+    out_time4 = []
+    for sm in out_time3:
+        L_prob= prob_num_all(sm) #分析可能性
+        r_L = [1,3,5,7,9] # 随机指定四个空值用于填充
+        for r1 in L_prob[r_L[0]][2]:
+            for r2 in L_prob[r_L[1]][2]:
+                for r3 in L_prob[r_L[2]][2]:
+                    for r4 in L_prob[r_L[3]][2]:
+                        for r5 in L_prob[r_L[4]][2]:
+                            sm_p = sm.copy()
+                            sm_p[L_prob[r_L[0]][0], L_prob[r_L[0]][1]] = r1
+                            sm_p[L_prob[r_L[1]][0], L_prob[r_L[1]][1]] = r2
+                            sm_p[L_prob[r_L[2]][0], L_prob[r_L[2]][1]] = r3
+                            sm_p[L_prob[r_L[3]][0], L_prob[r_L[3]][1]] = r4
+                            sm_p[L_prob[r_L[3]][0], L_prob[r_L[3]][1]] = r5
+                            r_combine = [r1, r2, r3, r4, r5]
+                            if rule_check(sm_p):
+                                print('预测数为:', r_combine)
+                                k = 0
+                                while(1):
+                                    k += 1
+                                    if k%10 == 0:
+                                        print('k:', k)
+                                    sm_p, err = sol_origin(sm_p, prt=0) # 常规解法
+                                    if err:
+                                        break
+                                    if complete_check(sm_p):
+                                        complete = True
+                                        sm_complete = sm_p.copy()
+                                        print('-----------------------解出答案-------------------------')
+                                        break
+                                    if k > 30:
+                                        if rule_check(sm_p, prt=0):
+                                            out_time4.append(sm_p.copy())
+                                            print('备选方案已添加')
+                                        else:
+                                            print('超时')
+                                        break
+                            if complete:
+                                break
                         if complete:
                             break
                     if complete:
